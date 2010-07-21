@@ -6,7 +6,7 @@
 # no regular words or you'll be exposed to dictionary attacks.
 ActionController::Base.session = {
   :key         => '_fosbury_session',
-  :secret      => 'a72f47ca96bb594319501262404cab54941426ef3ab19f42128869f5ac0c12e7e23b6b48e0668d9ccff7e51e5440a31dc8afb9e72334179accd1037c9cc0fce3'
+  :secret      => MySociety::Config.get("COOKIE_STORE_SESSION_SECRET", 'this default is insecure as code is open source, please override for live sites in config/general; this will do for local development')
 }
 
 # Use the database for sessions instead of the cookie-based default,
