@@ -30,6 +30,7 @@ Rails::Initializer.run do |config|
   config.gem "rack", :version => '1.0.1'
   config.gem "haml", :version => '2.2.20'
   config.gem "erubis", :version => '2.6.5'
+  config.gem "friendly_id", :version => '~> 2.3'
   
   # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"

@@ -9,6 +9,49 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 0) do
+ActiveRecord::Schema.define(:version => 20100802132126) do
+
+  create_table "slugs", :force => true do |t|
+    t.string   "name"
+    t.integer  "sluggable_id"
+    t.integer  "sequence",                     :default => 1, :null => false
+    t.string   "sluggable_type", :limit => 40
+    t.string   "scope"
+    t.datetime "created_at"
+  end
+
+  add_index "slugs", ["name", "sluggable_type", "sequence", "scope"], :name => "index_slugs_on_n_s_s_and_s", :unique => true
+  add_index "slugs", ["sluggable_id"], :name => "index_slugs_on_sluggable_id"
+
+  create_table "task_parameters", :force => true do |t|
+    t.string   "name"
+    t.boolean  "required"
+    t.text     "description"
+    t.integer  "task_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "task_providers", :force => true do |t|
+    t.string   "name"
+    t.string   "api_key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "task_types", :force => true do |t|
+    t.string   "name"
+    t.string   "cached_slug"
+    t.string   "callback_url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "task_provider_id"
+  end
+
+  create_table "tasks", :force => true do |t|
+    t.integer  "task_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

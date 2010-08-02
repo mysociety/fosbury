@@ -1,0 +1,27 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  required: false
+  description: MyText
+  task_type_id: 1
+
+two:
+  name: MyString
+  required: false
+  description: MyText
+  task_type_id: 1
+
+# == Schema Information
+#
+# Table name: task_parameters
+#
+#  id           :integer         not null, primary key
+#  name         :string(255)
+#  required     :boolean
+#  description  :text
+#  task_type_id :integer
+#  created_at   :datetime
+#  updated_at   :datetime
+#
+

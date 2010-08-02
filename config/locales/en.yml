@@ -3,3 +3,4 @@
 
 en:
   hello: "Hello world"
+  bad_api_key: Missing or invalid API key
