@@ -5,7 +5,7 @@
 #  id           :integer         not null, primary key
 #  name         :string(255)
 #  cached_slug  :string(255)
-#  callback_url :string(255)
+#  start_url :string(255)
 #  created_at   :datetime
 #  updated_at   :datetime
 #

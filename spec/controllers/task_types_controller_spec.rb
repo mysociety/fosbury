@@ -4,7 +4,7 @@ describe TaskTypesController do
   
   def default_tasktype_attrs
     { :name => 'A test task type', 
-      :callback_url => 'http://www.example.com/test_task_callback' }
+      :start_url => 'http://www.example.com/test_task_start' }
   end
   
   def response_json
@@ -80,7 +80,7 @@ describe TaskTypesController do
       TaskType.stub!(:find).and_return(TaskType.new(default_tasktype_attrs))
       make_request
       response_json["task_type"]["name"].should == default_tasktype_attrs[:name]
-      response_json["task_type"]["callback_url"].should == default_tasktype_attrs[:callback_url]
+      response_json["task_type"]["start_url"].should == default_tasktype_attrs[:start_url]
     end
     
   end

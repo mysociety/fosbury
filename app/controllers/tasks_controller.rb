@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+
 class TasksController < ApplicationController
   protect_from_forgery :only => []
   
@@ -17,8 +20,10 @@ class TasksController < ApplicationController
       [:task, :action, :controller].each{ |key| params.delete(key) } 
       
       # make a querystring out of the rest
-      querystring = params.map{|k,v| "#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
-      redirect_url = @task_type.callback_url
+      querystring_params = params
+      querystring_params['task_id'] = @task.id.to_s
+      querystring = querystring_params.map{ |k,v| "#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
+      redirect_url = @task_type.start_url
       if !querystring.blank?
         redirect_url += "?#{querystring}" 
       end
@@ -29,9 +34,43 @@ class TasksController < ApplicationController
   end
   
   def update
+    if params[:id]
+      if params[:task] and params[:task][:status]
+        if params[:task][:status].to_sym == :complete
+          complete_task
+        end
+      end
+    end
   end
   
   def destroy
+  end
+  
+  private
+  
+  def complete_task
+    task = Task.find(params[:id])
+    task.update_attribute(:status, :complete)
+    json_params = task.callback_params
+    if params[:task][:data]
+      json_params[:data] = params[:task][:data]
+    end
+    response, response_data = external_json_request(task.callback_url, :post, task.callback_params)
+    redirect_to task.return_url
+  end
+  
+  def external_json_request(uri_string, method=:get, request_data={})
+    uri = URI.parse(uri_string)
+    http = Net::HTTP.new(uri.host)
+    initheader = { 'Content-Type' =>'application/json' } 
+    if method == :get
+      response, response_data = http.get(uri.path, initheader)
+    elsif method == :post
+      response, response_data = http.post(uri.path, request_data.to_json, initheader)
+    else
+      raise NotImplementedError, "HTTP method #{method} not implemented"
+    end
+    return response, response_data
   end
   
 end

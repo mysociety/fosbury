@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100802132126) do
+ActiveRecord::Schema.define(:version => 20100803101541) do
 
   create_table "slugs", :force => true do |t|
     t.string   "name"
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(:version => 20100802132126) do
   create_table "task_types", :force => true do |t|
     t.string   "name"
     t.string   "cached_slug"
-    t.string   "callback_url"
+    t.string   "start_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "task_provider_id"
@@ -52,6 +52,10 @@ ActiveRecord::Schema.define(:version => 20100802132126) do
     t.integer  "task_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "callback_url"
+    t.text     "callback_params"
+    t.integer  "status_code",     :default => 0
+    t.text     "return_url"
   end
 
 end

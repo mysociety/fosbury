@@ -4,7 +4,7 @@ describe TaskType do
   before(:each) do
     @valid_attributes = {
       :name => "value for name",
-      :callback_url => "value for callback_url"
+      :start_url => "value for start_url"
     }
   end
 
