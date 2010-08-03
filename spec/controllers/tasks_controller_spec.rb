@@ -21,19 +21,19 @@ describe TasksController do
     end
     
     def get_redirect_params
-      redirect = @response.redirected_to
+      redirect = response.redirected_to
       CGI.parse(redirect.split("?")[1])
     end
     
     def get_redirect_path
-      redirect = @response.redirected_to
+      redirect = response.redirected_to
       redirect.split("?")[0]
     end
     
     it 'should redirect to the task type start URL' do
       make_request(default_task_attrs)
       get_redirect_path.should == 'http://taskprovider.example.com/start'
-      @response.status.should == "302 Found"
+      response.status.should == "302 Found"
     end
     
     it 'should create a new task associated with the correct task type' do 
@@ -45,13 +45,13 @@ describe TasksController do
       task_attrs = default_task_attrs
       task_attrs[:task].delete(:task_type_id)
       make_request( task_attrs )
-      @response.status.should == "400 Bad Request"
+      response.status.should == "400 Bad Request"
     end
     
     it 'should return an error message and a bad request status code if the task type cannot be found' do 
       TaskType.stub!(:find).and_return(nil)
       make_request( default_task_attrs )
-      @response.status.should == "400 Bad Request"
+      response.status.should == "400 Bad Request"
     end
     
     it 'should pass any non-task parameters on to the task type start url as GET request parameters' do 
@@ -118,18 +118,32 @@ describe TasksController do
         make_request
       end
       
-      it 'should issue a POST request to the callback URL of the task containing any callback params defined on the task and any data passed to the request' do 
+      it 'should issue a POST request to the callback URL of the task containing any callback params defined on the task, any data passed to the request, the task id, and a status param of "complete"' do 
         expected_params = @callback_params.clone
         expected_params[:data] = @data
+        expected_params[:status] = :complete
+        expected_params[:task_id] = "55"
         controller.should_receive(:external_json_request).with('http://taskconsumer.example.com/callback', 
                                                                :post, 
                                                                expected_params)
+        make_request
+      end
+      
+      it "should not try to post to the callback URL if there isn't one" do 
+        @mock_task.stub!(:callback_url).and_return(nil)
+        controller.should_not_receive(:external_json_request)
         make_request
       end
 
       it 'should redirect the request to the return URL of the task' do
         make_request
         response.should redirect_to("http://taskconsumer.example.com/return")
+      end
+   
+      it 'should return a success code if there is no return URL for the task' do 
+        @mock_task.stub!(:return_url).and_return(nil)
+        make_request
+        response.status.should == "200 OK"
       end
       
     end

@@ -8,6 +8,10 @@ class TasksController < ApplicationController
   end
 
   def show 
+    @task = Task.find(params[:id])
+    respond_to do |format|
+      format.json{ render :json => @task.to_json(:methods => :status) }
+    end
   end
   
   def create
@@ -51,17 +55,26 @@ class TasksController < ApplicationController
   def complete_task
     task = Task.find(params[:id])
     task.update_attribute(:status, :complete)
-    json_params = task.callback_params
-    if params[:task][:data]
-      json_params[:data] = params[:task][:data]
+    if task.callback_url
+      json_params = task.callback_params
+      if params[:task][:data]
+        json_params[:data] = params[:task][:data]
+      end
+      json_params[:status] = :complete
+      json_params[:task_id] = params[:id]
+      response, response_data = external_json_request(task.callback_url, :post, task.callback_params)
     end
-    response, response_data = external_json_request(task.callback_url, :post, task.callback_params)
-    redirect_to task.return_url
+    if task.return_url
+      redirect_to task.return_url
+    else
+      head :ok
+      return false
+    end
   end
   
   def external_json_request(uri_string, method=:get, request_data={})
     uri = URI.parse(uri_string)
-    http = Net::HTTP.new(uri.host)
+    http = Net::HTTP.new(uri.host, uri.port)
     initheader = { 'Content-Type' =>'application/json' } 
     if method == :get
       response, response_data = http.get(uri.path, initheader)
@@ -70,6 +83,7 @@ class TasksController < ApplicationController
     else
       raise NotImplementedError, "HTTP method #{method} not implemented"
     end
+    RAILS_DEFAULT_LOGGER.info("MADE EXTERNAL JSON REQUEST #{request_data.to_json}")
     return response, response_data
   end
   

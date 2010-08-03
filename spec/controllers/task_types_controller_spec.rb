@@ -37,7 +37,7 @@ describe TaskTypesController do
     
     it 'should set the provider of the task type' do 
       make_request( :task_type => default_tasktype_attrs )
-      response_json["task_type"]["task_provider_id"].should == 33
+      response_json["task_provider_id"].should == 33
     end
     
     it 'should create a task type given simple json params' do 
@@ -55,7 +55,7 @@ describe TaskTypesController do
                                                   :description => 'An integer parameter' }]
       make_request( :task_type => tasktype_attrs )
       @response.status.should == "200 OK"
-      response_json["task_type"]["parameters"].size.should == 2
+      response_json["parameters"].size.should == 2
     end
     
     it 'should return an error in json if sent malformed parameters' do 
@@ -79,8 +79,8 @@ describe TaskTypesController do
     it 'should return a json hash of task type attributes' do 
       TaskType.stub!(:find).and_return(TaskType.new(default_tasktype_attrs))
       make_request
-      response_json["task_type"]["name"].should == default_tasktype_attrs[:name]
-      response_json["task_type"]["start_url"].should == default_tasktype_attrs[:start_url]
+      response_json["name"].should == default_tasktype_attrs[:name]
+      response_json["start_url"].should == default_tasktype_attrs[:start_url]
     end
     
   end
