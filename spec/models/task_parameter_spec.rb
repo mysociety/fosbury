@@ -1,3 +1,17 @@
+# == Schema Information
+# Schema version: 20100803101541
+#
+# Table name: task_parameters
+#
+#  id           :integer         not null, primary key
+#  name         :string(255)
+#  required     :boolean
+#  description  :text
+#  task_type_id :integer
+#  created_at   :datetime
+#  updated_at   :datetime
+#
+
 require 'spec_helper'
 
 describe TaskParameter do
@@ -14,17 +28,4 @@ describe TaskParameter do
     TaskParameter.create!(@valid_attributes)
   end
 end
-
-# == Schema Information
-#
-# Table name: task_parameters
-#
-#  id           :integer         not null, primary key
-#  name         :string(255)
-#  required     :boolean
-#  description  :text
-#  task_type_id :integer
-#  created_at   :datetime
-#  updated_at   :datetime
-#
 

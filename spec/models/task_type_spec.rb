@@ -1,3 +1,17 @@
+# == Schema Information
+# Schema version: 20100803101541
+#
+# Table name: task_types
+#
+#  id               :integer         not null, primary key
+#  name             :string(255)
+#  cached_slug      :string(255)
+#  start_url        :string(255)
+#  created_at       :datetime
+#  updated_at       :datetime
+#  provider_id :integer
+#
+
 require 'spec_helper'
 
 describe TaskType do
@@ -12,16 +26,4 @@ describe TaskType do
     TaskType.create!(@valid_attributes)
   end
 end
-
-# == Schema Information
-#
-# Table name: task_types
-#
-#  id           :integer         not null, primary key
-#  name         :string(255)
-#  cached_slug  :string(255)
-#  callback_url :string(255)
-#  created_at   :datetime
-#  updated_at   :datetime
-#
 

@@ -1,7 +1,7 @@
 # == Schema Information
 # Schema version: 20100803101541
 #
-# Table name: task_providers
+# Table name: applications
 #
 #  id         :integer         not null, primary key
 #  name       :string(255)
@@ -10,12 +10,6 @@
 #  updated_at :datetime
 #
 
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  name: MyString
-  api_key: MyString
-
-two:
-  name: MyString
-  api_key: MyString
+class Application < ActiveRecord::Base
+  has_many :tasks
+end

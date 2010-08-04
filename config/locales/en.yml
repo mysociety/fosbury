@@ -2,5 +2,9 @@
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
   bad_api_key: Missing or invalid API key
+  built_by: Built by {{link}}
+  powered_by: Powered by {{link}}
+  parameters: Parameters
+  fosbury_intro: Project Fosbury is about helping people get over difficult obstacles. It is a modular platform for breaking down a complicated civic task into pieces which can then be allocated to one or more people. 
+  task_list: These are the tasks you can currently assign to someone using Fosbury:

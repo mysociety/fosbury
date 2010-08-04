@@ -1,0 +1,15 @@
+body {
+  font-family: verdana, sans-serif;
+}
+
+#footer {
+  clear: both; 
+  text-align:center;
+  padding: 1em;
+}
+
+#footer li {
+  list-style-type: none;
+  display: inline;
+  padding: 0 1em 0 1em;
+}

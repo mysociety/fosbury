@@ -7,37 +7,22 @@ describe TaskTypesController do
       :start_url => 'http://www.example.com/test_task_start' }
   end
   
-  def response_json
-    JSON.parse(@response.body)
+  before do 
+    stub_applications_for_api_keys
   end
   
   describe 'responding to POST #create' do 
     
-    before do 
-      task_provider = mock_model(TaskProvider, :id => 33)
-      TaskProvider.stub!(:find_by_api_key).with('A test API key').and_return(task_provider)
-    end
-    
-    def make_request(data, skip_api_key=false)
-      data[:api_key] = 'A test API key' unless skip_api_key
+    def make_request(data, api_key='Provider API key')
+      data[:api_key] = api_key
       post :create, data
     end
     
-    it 'should return a forbidden status code and appropriate error message if the api key is missing' do 
-      make_request({ :task_type => default_tasktype_attrs }, skip_api_key=true)
-      @response.status.should == "403 Forbidden"
-      response_json['error']['message'].should == "Missing or invalid API key"
-    end
-    
-    it 'should return a forbidden status code and appropriate error message if the api key is invalid' do 
-      make_request({ :task_type => default_tasktype_attrs, :api_key => 'Bad API key' }, skip_api_key=true)
-      @response.status.should == "403 Forbidden"
-      response_json['error']['message'].should == "Missing or invalid API key"
-    end
+    it_should_behave_like "an action requiring an API key"
     
     it 'should set the provider of the task type' do 
       make_request( :task_type => default_tasktype_attrs )
-      response_json["task_provider_id"].should == 33
+      response_json["provider_id"].should == 33
     end
     
     it 'should create a task type given simple json params' do 
@@ -69,15 +54,52 @@ describe TaskTypesController do
     end
     
   end
-
+  
+  describe 'responding to PUT #update' do 
+    
+    before do
+      mock_task_type = mock_model(TaskType, :provider => @provider_application)
+      TaskType.stub!(:find).and_return(mock_task_type)
+    end
+  
+    def make_request(data={}, api_key='Provider API key')
+      data[:id] = 'a-test-task' if !data[:id]
+      data[:api_key] = api_key
+      put :update, data
+    end
+    
+    it_should_behave_like "an action that can only be done by the task type provider"
+    
+  end
+  
+  describe 'responding to DELETE #destroy' do 
+    
+    before do
+      mock_task_type = mock_model(TaskType, :provider => @provider_application)
+      TaskType.stub!(:find).and_return(mock_task_type)
+    end
+  
+    def make_request(data={}, api_key='Provider API key')
+      data[:id] = 'a-test-task' if !data[:id]
+      data[:api_key] = api_key
+      delete :destroy, data
+    end
+    
+    it_should_behave_like "an action that can only be done by the task type provider"
+    
+  end
+  
   describe 'responding to GET #show' do 
   
+    before do 
+      TaskType.stub!(:find).and_return(TaskType.new(default_tasktype_attrs))
+    end
+    
     def make_request
       get :show, { :id => "a-test-task" }
     end
     
     it 'should return a json hash of task type attributes' do 
-      TaskType.stub!(:find).and_return(TaskType.new(default_tasktype_attrs))
       make_request
       response_json["name"].should == default_tasktype_attrs[:name]
       response_json["start_url"].should == default_tasktype_attrs[:start_url]

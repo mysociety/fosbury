@@ -33,11 +33,18 @@ class ApplicationController < ActionController::Base
   protected 
   
   def check_api_key
-    if params[:api_key] and @task_provider = TaskProvider.find_by_api_key(params[:api_key])
+    if params[:api_key] and @application = Application.find_by_api_key(params[:api_key])
       return true
     end
-    render :json => { :error => { :message => t(:bad_api_key) } }.to_json, :status => :forbidden 
-    return false
+    puts params[:api_key]
+    bad_api_key
   end
   
+  def bad_api_key
+    respond_to do |format|
+      format.json{ render :json => { :error => { :message => t(:bad_api_key) } }.to_json, :status => :forbidden }
+      format.html{ render :text => t(:bad_api_key), :status => :forbidden }
+    end
+    return false
+  end
 end

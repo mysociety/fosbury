@@ -1,8 +1,23 @@
+# == Schema Information
+# Schema version: 20100803101541
+#
+# Table name: tasks
+#
+#  id              :integer         not null, primary key
+#  task_type_id    :integer
+#  created_at      :datetime
+#  updated_at      :datetime
+#  callback_url    :string(255)
+#  callback_params :text
+#  status_code     :integer         default(0)
+#  return_url      :text
+#
+
 class Task < ActiveRecord::Base
   belongs_to :task_type
-  belongs_to :task_provider
   validates_presence_of :task_type_id
   serialize :callback_params
+  belongs_to :task_consumer, :class_name => 'Application'
   
   STATUS_CODES = { 0 => 'In Progress', 
                    1 => 'Complete' }

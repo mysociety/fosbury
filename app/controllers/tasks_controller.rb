@@ -3,12 +3,12 @@ require 'uri'
 
 class TasksController < ApplicationController
   protect_from_forgery :only => []
-  
-  def index
-  end
+  before_filter :check_api_key
+  before_filter :find_task, :only => [:show, :update]
+  before_filter :check_task_type_provider_api_key, :only => [:update]
+  before_filter :check_provider_or_consumer_api_key, :only => [:show]
 
   def show 
-    @task = Task.find(params[:id])
     respond_to do |format|
       format.json{ render :json => @task.to_json(:methods => :status) }
     end
@@ -47,25 +47,44 @@ class TasksController < ApplicationController
     end
   end
   
-  def destroy
-  end
-  
   private
   
+  def check_task_type_provider_api_key
+    if @application && @task.task_type.provider == @application
+      return true
+    end
+    bad_api_key
+  end
+  
+  def check_provider_or_consumer_api_key
+    if @application 
+      if @task.task_type.provider == @application
+        return true
+      end
+      if @task.consumer == @application
+        return true
+      end
+    end
+    bad_api_key
+  end
+  
+  def find_task
+    @task = Task.find(params[:id])
+  end
+  
   def complete_task
-    task = Task.find(params[:id])
-    task.update_attribute(:status, :complete)
-    if task.callback_url
-      json_params = task.callback_params
+    @task.update_attribute(:status, :complete)
+    if @task.callback_url
+      json_params = @task.callback_params
       if params[:task][:data]
         json_params[:data] = params[:task][:data]
       end
       json_params[:status] = :complete
       json_params[:task_id] = params[:id]
-      response, response_data = external_json_request(task.callback_url, :post, task.callback_params)
+      response, response_data = external_json_request(@task.callback_url, :post, @task.callback_params)
     end
-    if task.return_url
-      redirect_to task.return_url
+    if @task.return_url
+      redirect_to @task.return_url
     else
       head :ok
       return false

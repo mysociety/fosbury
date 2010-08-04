@@ -1,3 +1,17 @@
+# == Schema Information
+# Schema version: 20100803101541
+#
+# Table name: task_types
+#
+#  id               :integer         not null, primary key
+#  name             :string(255)
+#  cached_slug      :string(255)
+#  start_url        :string(255)
+#  created_at       :datetime
+#  updated_at       :datetime
+#  task_provider_id :integer
+#
+
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
@@ -9,16 +23,4 @@ two:
   name: MyString
   slug: MyString
   start_url: MyString
-
-# == Schema Information
-#
-# Table name: task_types
-#
-#  id           :integer         not null, primary key
-#  name         :string(255)
-#  cached_slug  :string(255)
-#  start_url :string(255)
-#  created_at   :datetime
-#  updated_at   :datetime
-#
 

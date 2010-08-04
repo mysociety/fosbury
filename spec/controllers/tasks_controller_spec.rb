@@ -3,16 +3,40 @@ require 'spec_helper'
 describe TasksController do
 
   before do 
+    # Don't make any external JSON requests during testing
     controller.stub!(:external_json_request)
+    stub_applications_for_api_keys
+  end
+  
+  describe 'responding to GET #show' do 
+
+    before do
+      mock_task = mock_model(Task, :to_json => {},
+                                   :task_type => mock_model(TaskType, :provider => @provider_application),
+                                   :consumer => @consumer_application)
+      Task.stub!(:find).and_return(mock_task)
+    end
+    
+    def make_request(data, api_key='Provider API key')
+      default_data = { :id => 66 }
+      data = default_data if data.empty?
+      data[:api_key] = api_key
+      get :show, data
+    end
+    
+    it_should_behave_like "an action that can only be done by the task type provider or task consumer"
+
   end
   
   describe 'responding to POST #create' do 
 
     before do 
-      TaskType.stub!(:find).and_return(mock_model(TaskType, :start_url => 'http://taskprovider.example.com/start'))
+      mock_task_type = mock_model(TaskType, :start_url => 'http://taskprovider.example.com/start')
+      TaskType.stub!(:find).and_return(mock_task_type)
     end
     
-    def make_request data
+    def make_request(data, api_key='Provider API key')
+      data[:api_key] = api_key
       post :create, data
     end
     
@@ -30,6 +54,8 @@ describe TasksController do
       redirect.split("?")[0]
     end
     
+    it_should_behave_like "an action requiring an API key"
+    
     it 'should redirect to the task type start URL' do
       make_request(default_task_attrs)
       get_redirect_path.should == 'http://taskprovider.example.com/start'
@@ -38,19 +64,19 @@ describe TasksController do
     
     it 'should create a new task associated with the correct task type' do 
       Task.should_receive(:create).with( 'task_type_id' => "a-test-task" )
-      make_request( default_task_attrs )
+      make_request(default_task_attrs)
     end
   
     it 'should return an error message and a bad request status code if no task type id is given' do 
       task_attrs = default_task_attrs
       task_attrs[:task].delete(:task_type_id)
-      make_request( task_attrs )
+      make_request(task_attrs)
       response.status.should == "400 Bad Request"
     end
     
     it 'should return an error message and a bad request status code if the task type cannot be found' do 
       TaskType.stub!(:find).and_return(nil)
-      make_request( default_task_attrs )
+      make_request(default_task_attrs)
       response.status.should == "400 Bad Request"
     end
     
@@ -94,25 +120,31 @@ describe TasksController do
   end
 
   describe 'responding to PUT #update' do 
+
+    before do 
+      @data = { 'data_one' => 'data_value_one', 
+                'data_two' => 'data_value_two' }
+      @callback_params = { :callback_param_one => "callback_value_one", 
+                           :callback_param_two => "callback_value_two" }
+      @mock_task = mock_model(Task, :callback_url => "http://taskconsumer.example.com/callback", 
+                                    :callback_params => @callback_params,
+                                    :update_attribute => true, 
+                                    :return_url => 'http://taskconsumer.example.com/return', 
+                                    :task_type => mock_model(TaskType, :provider => @provider_application))
+      Task.stub!(:find).and_return(@mock_task)
+    end
+    
+    def make_request(data={}, api_key='Provider API key')
+      default_data = { :id => 55, :task => { :status => :complete, :data => @data } }
+      data = default_data if data.empty?
+      data[:api_key] = api_key
+      put :update, data
+    end
+        
+    it_should_behave_like "an action that can only be done by the task type provider"
     
     describe 'when the request has a "status" parameter with value "complete"' do 
       
-      before do 
-        @data = { 'data_one' => 'data_value_one', 
-                  'data_two' => 'data_value_two' }
-        @callback_params = { :callback_param_one => "callback_value_one", 
-                             :callback_param_two => "callback_value_two" }
-        @mock_task = mock_model(Task, :callback_url => "http://taskconsumer.example.com/callback", 
-                                      :callback_params => @callback_params,
-                                      :update_attribute => true, 
-                                      :return_url => 'http://taskconsumer.example.com/return')
-        Task.stub!(:find).and_return(@mock_task)
-      end
-            
-      def make_request
-        put :update, { :id => 55, :task => { :status => :complete, :data => @data } }
-      end      
-            
       it 'should set the status of the task to complete if it is not complete' do 
         @mock_task.should_receive(:update_attribute).with(:status, :complete)
         make_request
