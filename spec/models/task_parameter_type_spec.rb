@@ -1,7 +1,7 @@
 # == Schema Information
 # Schema version: 20100803101541
 #
-# Table name: task_parameters
+# Table name: task_parameter_types
 #
 #  id           :integer         not null, primary key
 #  name         :string(255)
@@ -14,7 +14,7 @@
 
 require 'spec_helper'
 
-describe TaskParameter do
+describe TaskParameterType do
   before(:each) do
     @valid_attributes = {
       :name => "value for name",
@@ -25,7 +25,7 @@ describe TaskParameter do
   end
 
   it "should create a new instance given valid attributes" do
-    TaskParameter.create!(@valid_attributes)
+    TaskParameterType.create!(@valid_attributes)
   end
 end
 

@@ -26,14 +26,18 @@ end
 
 def stub_applications_for_api_keys
   # set up a valid application for the API key
-  @provider_application = mock_model(Application, :id => 33)
+  @provider_application = mock_model(Application, :id => 33, :name => "Provider app")
   Application.stub!(:find_by_api_key).with('Provider API key').and_return(@provider_application)
-  @other_application = mock_model(Application, :id => 44)
+  @other_application = mock_model(Application, :id => 44, :name => "Other app")
   Application.stub!(:find_by_api_key).with('Other API key').and_return(@other_application)
-  @consumer_application = mock_model(Application, :id => 55)
-  Application.stub!(:find_by_api_key).with('Consumer API key').and_return(@consumer_application)  
+  @setter_application = mock_model(Application, :id => 55, :name => "Setter app")
+  Application.stub!(:find_by_api_key).with('Setter API key').and_return(@setter_application)  
 end
-  
+
+def auth(api_key)
+  request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("A Test Application:#{api_key}")
+end
+
 def response_json
   JSON.parse(@response.body)
 end

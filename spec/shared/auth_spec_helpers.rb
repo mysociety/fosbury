@@ -36,12 +36,12 @@ module SharedBehaviours
     
   end
   
-  shared_examples_for "an action that can only be done by the task type provider or task consumer" do 
+  shared_examples_for "an action that can only be done by the task type provider or task setter" do 
   
     it_should_behave_like "an action that can only be done by the task type provider"
     
-    it 'should not return a forbidden status code if the API key belongs to the task consumer' do 
-      make_request({}, api_key='Consumer API key')
+    it 'should not return a forbidden status code if the API key belongs to the task setter' do 
+      make_request({}, api_key='Setter API key')
       response.status.should_not == "403 Forbidden"
     end
     

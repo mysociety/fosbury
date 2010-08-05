@@ -12,7 +12,7 @@
 #  updated_at   :datetime
 #
 
-class TaskParameter < ActiveRecord::Base
+class TaskParameterType < ActiveRecord::Base
   belongs_to :task
 end
 

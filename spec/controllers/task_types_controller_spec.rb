@@ -14,7 +14,7 @@ describe TaskTypesController do
   describe 'responding to POST #create' do 
     
     def make_request(data, api_key='Provider API key')
-      data[:api_key] = api_key
+      auth(api_key)
       post :create, data
     end
     
@@ -22,7 +22,7 @@ describe TaskTypesController do
     
     it 'should set the provider of the task type' do 
       make_request( :task_type => default_tasktype_attrs )
-      response_json["provider_id"].should == 33
+      response_json['task_type']["provider_id"].should == 33
     end
     
     it 'should create a task type given simple json params' do 
@@ -32,22 +32,22 @@ describe TaskTypesController do
     
     it 'should store task parameters sent as part of the task type attributes' do 
       tasktype_attrs = default_tasktype_attrs
-      tasktype_attrs[:parameters_attributes] = [{ :name => 'Parameter one', 
-                                                  :required => true, 
-                                                  :description => 'A string parameter' }, 
-                                                { :name => 'Parameter two', 
-                                                  :required => false, 
-                                                  :description => 'An integer parameter' }]
+      tasktype_attrs[:parameter_types_attributes] = [{ :name => 'Parameter one', 
+                                                       :required => true, 
+                                                       :description => 'A string parameter' }, 
+                                                     { :name => 'Parameter two', 
+                                                       :required => false, 
+                                                       :description => 'An integer parameter' }]
       make_request( :task_type => tasktype_attrs )
-      @response.status.should == "200 OK"
-      response_json["parameters"].size.should == 2
+      response.status.should == "200 OK"
+      response_json['task_type']["parameter_types"].size.should == 2
     end
     
     it 'should return an error in json if sent malformed parameters' do 
       tasktype_attrs = default_tasktype_attrs
-      tasktype_attrs[:parameters_attributes] = [{ :name => 'Parameter one', 
-                                                  :bad_param => true, 
-                                                  :description => 'A string parameter' }]
+      tasktype_attrs[:parameter_types_attributes] = [{ :name => 'Parameter one', 
+                                                       :bad_param => true, 
+                                                       :description => 'A string parameter' }]
       make_request( :task_type => tasktype_attrs )
       @response.status.should == "500 Internal Server Error"
       response_json['error']['message'].should == 'unknown attribute: bad_param'
@@ -64,7 +64,7 @@ describe TaskTypesController do
   
     def make_request(data={}, api_key='Provider API key')
       data[:id] = 'a-test-task' if !data[:id]
-      data[:api_key] = api_key
+      auth(api_key)
       put :update, data
     end
     
@@ -81,7 +81,7 @@ describe TaskTypesController do
   
     def make_request(data={}, api_key='Provider API key')
       data[:id] = 'a-test-task' if !data[:id]
-      data[:api_key] = api_key
+      auth(api_key)
       delete :destroy, data
     end
     
@@ -101,8 +101,8 @@ describe TaskTypesController do
     
     it 'should return a json hash of task type attributes' do 
       make_request
-      response_json["name"].should == default_tasktype_attrs[:name]
-      response_json["start_url"].should == default_tasktype_attrs[:start_url]
+      response_json["task_type"]["name"].should == default_tasktype_attrs[:name]
+      response_json["task_type"]["start_url"].should == default_tasktype_attrs[:start_url]
     end
     
   end

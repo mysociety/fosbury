@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100804160519) do
+ActiveRecord::Schema.define(:version => 20100805155715) do
 
   create_table "applications", :force => true do |t|
     t.string   "name"
@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(:version => 20100804160519) do
   add_index "slugs", ["name", "sluggable_type", "sequence", "scope"], :name => "index_slugs_on_n_s_s_and_s", :unique => true
   add_index "slugs", ["sluggable_id"], :name => "index_slugs_on_sluggable_id"
 
-  create_table "task_parameters", :force => true do |t|
+  create_table "task_parameter_types", :force => true do |t|
     t.string   "name"
     t.boolean  "required"
     t.text     "description"
@@ -58,6 +58,8 @@ ActiveRecord::Schema.define(:version => 20100804160519) do
     t.integer  "status_code",     :default => 0
     t.text     "return_url"
     t.integer  "setter_id"
+    t.text     "params"
+    t.text     "task_data"
   end
 
 end

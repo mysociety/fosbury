@@ -1,7 +1,7 @@
 # == Schema Information
 # Schema version: 20100803101541
 #
-# Table name: task_parameters
+# Table name: task_parameter_types
 #
 #  id           :integer         not null, primary key
 #  name         :string(255)
