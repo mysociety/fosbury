@@ -33,18 +33,25 @@ class ApplicationController < ActionController::Base
   protected 
   
   def check_api_key
-    if params[:api_key] and @application = Application.find_by_api_key(params[:api_key])
-      return true
+    authenticate_with_http_basic do |application_name, api_key|
+      if api_key and @application = Application.find_by_api_key(api_key)
+        return true
+      end
     end
-    puts params[:api_key]
     bad_api_key
+    return false
   end
   
   def bad_api_key
     respond_to do |format|
-      format.json{ render :json => { :error => { :message => t(:bad_api_key) } }.to_json, :status => :forbidden }
-      format.html{ render :text => t(:bad_api_key), :status => :forbidden }
+      format.json do
+        render :json => { :error => { :message => t(:bad_api_key) } }.to_json, :status => :forbidden 
+      end
+      format.html do 
+        render :text => t(:bad_api_key), :status => :forbidden 
+      end
     end
     return false
   end
+  
 end
