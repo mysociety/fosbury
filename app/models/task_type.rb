@@ -14,10 +14,10 @@
 
 class TaskType < ActiveRecord::Base
   has_friendly_id :name, :use_slug => true
-  has_many :parameters, :class_name => 'TaskParameter'
+  has_many :parameter_types, :class_name => 'TaskParameterType'
   has_many :tasks
   belongs_to :provider, :class_name => "Application"
-  accepts_nested_attributes_for :parameters
+  accepts_nested_attributes_for :parameter_types
 
 end
 

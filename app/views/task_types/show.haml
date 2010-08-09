@@ -2,9 +2,9 @@
 %p= @task_type.description
 
 %h3= t(:parameters)
-- @task_type.parameters.each do |parameter| 
+- @task_type.parameter_types.each do |parameter_type| 
   .task-parameter
-    .name= parameter.name
-    .description= parameter.description
-    .required= parameter.required? ? "Required" : "Optional"
+    .name= parameter_type.name
+    .description= parameter_type.description
+    .required= parameter_type.required? ? "Required" : "Optional"
     

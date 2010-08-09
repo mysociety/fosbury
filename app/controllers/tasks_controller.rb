@@ -6,33 +6,31 @@ class TasksController < ApplicationController
   before_filter :check_api_key
   before_filter :find_task, :only => [:show, :update]
   before_filter :check_task_type_provider_api_key, :only => [:update]
-  before_filter :check_provider_or_consumer_api_key, :only => [:show]
+  before_filter :check_provider_or_setter_api_key, :only => [:show]
 
   def show 
     respond_to do |format|
-      format.json{ render :json => @task.to_json(:methods => :status) }
+      format.json{ render_json(@task) }
+      format.html do
+        render :text => @task.to_yaml.to_s
+      end
     end
   end
   
   def create
     if params[:task] and params[:task][:task_type_id]
-      @task_type = TaskType.find(params[:task][:task_type_id])
+      @task_type = TaskType.find(params[:task].delete(:task_type_id))
     end
-    @task = Task.create( params[:task] )    
-    if @task and @task_type
-      # remove the fosbury params
-      [:task, :action, :controller].each{ |key| params.delete(key) } 
-      
-      # make a querystring out of the rest
-      querystring_params = params
-      querystring_params['task_id'] = @task.id.to_s
-      querystring = querystring_params.map{ |k,v| "#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
-      redirect_url = @task_type.start_url
-      if !querystring.blank?
-        redirect_url += "?#{querystring}" 
+    if @task_type 
+      params[:task][:task_type_id] = @task_type.id
+      params[:task][:setter] = @application
+      @task = Task.create(params[:task])   
+      if @task 
+        respond_to do |format|
+          format.json{ render_json(@task) }
+        end
+        return
       end
-      redirect_to redirect_url
-      return 
     end
     render :status => :bad_request and return false
   end
@@ -49,6 +47,10 @@ class TasksController < ApplicationController
   
   private
   
+  def render_json object
+    render :json => object.to_json(:methods => [ :status, :start_url, :provider_name, :setter_name ] ) 
+  end
+  
   def check_task_type_provider_api_key
     if @application && @task.task_type.provider == @application
       return true
@@ -56,16 +58,17 @@ class TasksController < ApplicationController
     bad_api_key
   end
   
-  def check_provider_or_consumer_api_key
+  def check_provider_or_setter_api_key
     if @application 
       if @task.task_type.provider == @application
         return true
       end
-      if @task.consumer == @application
+      if @task.setter == @application
         return true
       end
     end
     bad_api_key
+    return false
   end
   
   def find_task
@@ -74,20 +77,20 @@ class TasksController < ApplicationController
   
   def complete_task
     @task.update_attribute(:status, :complete)
+    @task.update_attribute(:task_data, params[:task][:task_data])
     if @task.callback_url
       json_params = @task.callback_params
-      if params[:task][:data]
-        json_params[:data] = params[:task][:data]
+      if params[:task][:task_data]
+        json_params[:task_data] = params[:task][:task_data]
       end
       json_params[:status] = :complete
       json_params[:task_id] = params[:id]
-      response, response_data = external_json_request(@task.callback_url, :post, @task.callback_params)
+      if @task.setter != @task.task_type.provider 
+        response, response_data = external_json_request(@task.callback_url, :post, @task.callback_params)
+      end
     end
-    if @task.return_url
-      redirect_to @task.return_url
-    else
-      head :ok
-      return false
+    respond_to do |format|
+      format.json{ render_json(@task) }
     end
   end
   

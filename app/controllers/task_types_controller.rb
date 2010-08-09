@@ -36,7 +36,7 @@ class TaskTypesController < ApplicationController
   private 
   
   def render_json object
-    render :json => object.to_json( :include => :parameters )
+    render :json => object.to_json( :include => :parameter_types )
   end
   
   def find_task_type
