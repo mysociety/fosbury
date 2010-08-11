@@ -22,8 +22,9 @@ class Task < ActiveRecord::Base
   has_many :parameter_types, :class_name => 'TaskParameterType'
   belongs_to :setter, :class_name => 'Application'
 
-  STATUS_CODES = { 0 => 'In Progress', 
-                   1 => 'Complete' }
+  STATUS_CODES = { 0 => 'New', 
+                   1 => 'In Progress',
+                   2 => 'Complete' }
   
   SYMBOL_TO_STATUS_CODE = STATUS_CODES.inject({}) do |hash, (code, message)|
     hash[message.gsub(/ /, "").underscore.to_sym] = code
