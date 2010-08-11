@@ -55,6 +55,9 @@ class Task < ActiveRecord::Base
     if !self.params
       self.params = {}
     end
+    if ! task_type.start_url
+      return ''
+    end
     querystring_params = self.params
     querystring_params['task_id'] = self.id.to_s
     querystring = querystring_params.map{ |k,v| "#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")

@@ -31,7 +31,7 @@ describe Task do
     it "should update its status code" do 
       task = Task.new( :status_code => 0 )
       task.status = :complete
-      task.status_code.should == 1
+      task.status_code.should == 2
     end
     
   end
@@ -40,9 +40,9 @@ describe Task do
   
     it 'should return the correct symbol for its status code' do 
       task = Task.new( :status_code => 0 )
-      task.status.should == :in_progress
+      task.status.should == :new
       task.status_code = 1
-      task.status.should == :complete
+      task.status.should == :in_progress
     end
   end
   
@@ -50,9 +50,19 @@ describe Task do
   
     it 'should return the correct description for its status code' do 
       task = Task.new( :status_code => 0 )
-      task.status_description.should == 'In Progress'
+      task.status_description.should == 'New'
       task.status_code = 1
-      task.status_description.should == 'Complete'
+      task.status_description.should == 'In Progress'
+    end
+    
+  end
+  
+  describe "when creating a start url" do 
+    
+    it "should return '' if there is no start url for its task type" do 
+      @task_type = mock_model(TaskType, :start_url => nil)
+      task = Task.new(:task_type => @task_type)
+      task.start_url.should == ''
     end
     
   end
