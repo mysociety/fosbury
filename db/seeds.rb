@@ -22,40 +22,44 @@ TaskParameterType.create(:name => "location_type",
                         :description => "The FixMyTransport type of the location where the problem is",
                         :task_type => publish_problem)        
                                                           
-write_operator = TaskType.create(:name => 'Write to transport operator', 
+write_organization = TaskType.create(:name => 'Write to transport organization', 
                                  :provider => fix_my_transport,
                                  :start_url => "http://localhost:3000/problems/new")
                 
 TaskParameterType.create(:name => "location_id", 
                          :required => true, 
                          :description => "The FixMyTransport id of the location to write about",
-                         :task_type => write_operator)
+                         :task_type => write_organization)
 
 TaskParameterType.create(:name => "location_type", 
                         :required => true, 
                         :description => "The FixMyTransport type of the location to write about",
-                        :task_type => write_operator)
+                        :task_type => write_organization)
                         
-find_operator = TaskType.create(:name => 'Find transport operator', 
+find_organization = TaskType.create(:name => 'Find transport organization', 
                                 :provider => fix_my_transport, 
-                                :start_url => "http://localhost:3000/operator/find")
+                                :start_url => "http://localhost:3000/organization/find")
               
 TaskParameterType.create(:name => "location_id", 
                          :required => true, 
-                         :description => "The FixMyTransport id of the location to find the operator of",
-                         :task_type => find_operator)
+                         :description => "The FixMyTransport id of the location to find the organization responsible for",
+                         :task_type => find_organization)
 
 TaskParameterType.create(:name => "location_type", 
                         :required => true, 
-                        :description => "The FixMyTransport type of the location to find the operator of",
-                        :task_type => find_operator)
+                        :description => "The FixMyTransport type of the location to find the organization responsible for",
+                        :task_type => find_organization)
                         
-find_operator_contact = TaskType.create(:name => 'Find transport operator contact details', 
+find_organization_contact = TaskType.create(:name => 'Find transport organization contact details', 
                                         :provider => fix_my_transport,
-                                        :start_url => "http://localhost:3000/operator/find_contact")
+                                        :start_url => "http://localhost:3000/organization/find_contact")
 
-TaskParameterType.create(:name => "operator_id", 
+TaskParameterType.create(:name => "organization_id", 
                          :required => true, 
-                         :description => "The FixMyTransport id of the operator",
-                         :task_type => find_operator_contact)
-                                 
+                         :description => "The FixMyTransport id of the organization",
+                         :task_type => find_organization_contact)
+                         
+TaskParameterType.create(:name => "organization_type", 
+                        :required => true, 
+                        :description => "The FixMyTransport type of the organization",
+                        :task_type => find_organization_contact)
